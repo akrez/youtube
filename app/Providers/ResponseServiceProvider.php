@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Providers;
+namespace Ahmeti\ResponseService\Providers;
 
+use App\Services\ResponseService;
 use Illuminate\Support\ServiceProvider;
 
 class ResponseServiceProvider extends ServiceProvider
@@ -11,7 +12,9 @@ class ResponseServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton('ResponseService', function () {
+            return new ResponseService();
+        });
     }
 
     /**
