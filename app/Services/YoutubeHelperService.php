@@ -69,7 +69,7 @@ class YoutubeHelperService
             ->setProtocolVersion($guzzleResponse->getProtocolVersion());
     }
 
-    public static function fetchInfo($videoId): array
+    public static function getInfo($videoId): array
     {
         $url = 'https://www.youtube.com/youtubei/v1/player';
 
