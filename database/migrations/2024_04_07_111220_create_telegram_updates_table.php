@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedSmallInteger('status')->default('0');
             $table->longText('response');
             $table->unsignedInteger('offset')->nullable();
-            $table->unsignedInteger('new_offset')->nullable();
             $table->timestamps();
         });
     }

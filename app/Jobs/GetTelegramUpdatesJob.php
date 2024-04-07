@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Bus;
 
 class GetTelegramUpdatesJob implements ShouldQueue
 {
@@ -28,20 +29,21 @@ class GetTelegramUpdatesJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $offset = TelegramUpdate::max('new_offset') + 0;
-        $response = TelegramHelperService::getUpdates($offset + 1);
+        $newOffset = TelegramUpdate::max('offset') + 0;
+        $response = TelegramHelperService::getUpdates($newOffset + 1);
         $results = Arr::get($response->json(), 'result', []);
 
-        $newOffset = $offset;
         foreach ($results as $result) {
             $newOffset = max($result['update_id'], $newOffset);
-            SendTelegramMessageJob::dispatch($result['message']);
+            Bus::chain([
+                // new SyncYoutubeVideoInfoJob($result['message']),
+                new SendTelegramMessageJob($result['message']),
+            ])->dispatch();
         }
 
         TelegramHelperService::createTelegramUpdate(
             $response->status(),
             $response->body(),
-            $offset,
             $newOffset
         );
     }

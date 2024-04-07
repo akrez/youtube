@@ -23,16 +23,15 @@ class TelegramHelperService
             $url = "https://agent.aliakbarrezaei.ir/";
         }
 
-        return Http::withHeaders($headers)->get($url,);
+        return Http::withHeaders($headers)->get($url);
     }
 
-    public static function createTelegramUpdate($status, $response, $offset, $newOffset)
+    public static function createTelegramUpdate($status, $response, $offset)
     {
         return TelegramUpdate::create([
             'status' => $status,
             'response' => $response,
             'offset' => $offset,
-            'new_offset' => $newOffset,
         ]);
     }
 }
