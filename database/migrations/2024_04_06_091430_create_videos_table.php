@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('videos', function (Blueprint $table) {
             $table->string('id')->primary('id');
-            $table->unsignedSmallInteger('status')->default('0');
-            $table->string('title', 2048);
-            $table->json('formats')->nullable();
-            $table->json('adaptive_formats')->nullable();
+            $table->unsignedSmallInteger('status')->nullable()->default('0');
+            $table->string('title', 2048)->nullable();
+            $table->json('formats')->nullable()->default('[]');
+            $table->json('adaptive_formats')->nullable()->default('[]');
             $table->timestamp('synced_at')->nullable();
             $table->timestamps();
         });
