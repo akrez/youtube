@@ -52,17 +52,21 @@ class YoutubeUrlService
 
     public static function parse($string)
     {
-        if ($id = static::googleToId($string) and static::isYoutube($id)) {
-            return $id;
-        }
-
-        if ($id = static::youtubeToId($string) and static::isYoutube($id)) {
-            return $id;
-        }
         if (static::isYoutube($string)) {
             return $string;
         }
+        if ($id = static::googleToId($string) and static::isYoutube($id)) {
+            return $id;
+        }
+        if ($id = static::youtubeToId($string) and static::isYoutube($id)) {
+            return $id;
+        }
 
         return null;
+    }
+
+    public static function isValid(string $string): bool
+    {
+        return !!static::parse($string);
     }
 }
