@@ -15,8 +15,8 @@ return new class extends Migration
             $table->string('id')->primary('id');
             $table->unsignedSmallInteger('status')->nullable()->default('0');
             $table->string('title', 2048)->nullable();
-            $table->json('formats')->nullable()->default('[]');
-            $table->json('adaptive_formats')->nullable()->default('[]');
+            $table->json('formats')->nullable();
+            $table->json('adaptive_formats')->nullable();
             $table->timestamp('synced_at')->nullable();
             $table->timestamps();
         });
