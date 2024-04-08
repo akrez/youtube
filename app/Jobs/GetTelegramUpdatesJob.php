@@ -3,7 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\TelegramUpdate;
-use App\Services\TelegramHelperService;
+use App\Services\TelegramApiService;
+use App\Services\TelegramUpdateService;
 use App\Services\YoutubeUrlService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,7 +32,7 @@ class GetTelegramUpdatesJob implements ShouldQueue
     public function handle(): void
     {
         $newOffset = TelegramUpdate::max('offset') + 0;
-        $response = TelegramHelperService::getUpdates($newOffset + 1);
+        $response = TelegramApiService::getUpdates($newOffset + 1);
         $results = Arr::get($response->json(), 'result', []);
 
         foreach ($results as $result) {
@@ -56,7 +57,7 @@ class GetTelegramUpdatesJob implements ShouldQueue
             }
         }
 
-        TelegramHelperService::createTelegramUpdate(
+        TelegramUpdateService::createTelegramUpdate(
             $response->status(),
             $response->body(),
             $newOffset

@@ -2,13 +2,12 @@
 
 namespace App\Jobs;
 
-use App\Services\TelegramHelperService;
+use App\Services\TelegramApiService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Arr;
 
 class SendTelegramMessageJob implements ShouldQueue
 {
@@ -27,7 +26,7 @@ class SendTelegramMessageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        TelegramHelperService::sendMessage(
+        TelegramApiService::sendMessage(
             $this->chatId,
             $this->text,
             $this->replyToMessageId
