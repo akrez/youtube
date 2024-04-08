@@ -21,7 +21,7 @@ class TelegramHelperService
         $headers = [];
         if (1) {
             $headers['X-POWERED-BY'] = $url;
-            $url = "https://agent.aliakbarrezaei.ir/";
+            $url = "https://agent.akrezing.ir/";
         }
 
         return Http::withHeaders($headers)->post($url, $data);
@@ -40,7 +40,7 @@ class TelegramHelperService
         $headers = [];
         if (1) {
             $headers['X-POWERED-BY'] = $url;
-            $url = "https://agent.aliakbarrezaei.ir/";
+            $url = "https://agent.akrezing.ir/";
         }
 
         return Http::withHeaders($headers)->get($url, $data);
