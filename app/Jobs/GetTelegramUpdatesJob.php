@@ -51,7 +51,9 @@ class GetTelegramUpdatesJob implements ShouldQueue
             } else {
                 dispatch(new SendTelegramMessageJob(
                     $chatId,
-                    __("The given data was invalid."),
+                    __('validation.regex', [
+                        'attribute' => __('validation.attributes.v'),
+                    ]),
                     $messageId
                 ));
             }

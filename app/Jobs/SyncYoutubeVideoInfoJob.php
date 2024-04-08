@@ -2,14 +2,12 @@
 
 namespace App\Jobs;
 
-use App\Models\TelegramUpdate;
+use App\Services\VideoService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Bus;
 
 class SyncYoutubeVideoInfoJob implements ShouldQueue
 {
@@ -28,6 +26,6 @@ class SyncYoutubeVideoInfoJob implements ShouldQueue
      */
     public function handle(): void
     {
-        
+        VideoService::sync($this->videoId);
     }
 }
