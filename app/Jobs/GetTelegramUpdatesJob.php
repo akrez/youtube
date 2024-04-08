@@ -45,7 +45,7 @@ class GetTelegramUpdatesJob implements ShouldQueue
             $videoId = YoutubeUrlService::parse($text);
             if ($videoId) {
                 Bus::chain([
-                    new SyncYoutubeVideoInfoJob($result['message']),
+                    new SyncYoutubeVideoInfoJob($videoId),
                     new SendTelegramVideoJob($result['message']),
                 ])->dispatch();
             } else {
@@ -57,7 +57,7 @@ class GetTelegramUpdatesJob implements ShouldQueue
             }
         }
 
-        TelegramUpdateService::createTelegramUpdate(
+        TelegramUpdateService::create(
             $response->status(),
             $response->body(),
             $newOffset
