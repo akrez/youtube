@@ -15,7 +15,7 @@ class VideoIdRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!YoutubeUrlService::parse($value)) {
+        if (!YoutubeUrlService::isValid($value)) {
             $fail(__('validation.regex', [
                 'attribute' => __('validation.attributes.v'),
             ]));
