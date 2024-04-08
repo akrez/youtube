@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\TelegramUpdate;
 use App\Services\TelegramHelperService;
+use App\Services\YoutubeUrlService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -35,10 +36,24 @@ class GetTelegramUpdatesJob implements ShouldQueue
 
         foreach ($results as $result) {
             $newOffset = max($result['update_id'], $newOffset);
-            Bus::chain([
-                // new SyncYoutubeVideoInfoJob($result['message']),
-                new SendTelegramMessageJob($result['message']),
-            ])->dispatch();
+
+            $messageId = $result['message']['message_id'];
+            $chatId = $result['message']['chat']['id'];
+            $text = $result['message']['text'];
+
+            $videoId = YoutubeUrlService::parse($text);
+            if ($videoId) {
+                Bus::chain([
+                    new SyncYoutubeVideoInfoJob($result['message']),
+                    new SendTelegramVideoJob($result['message']),
+                ])->dispatch();
+            } else {
+                dispatch(new SendTelegramMessageJob(
+                    $chatId,
+                    __("The given data was invalid."),
+                    $messageId
+                ));
+            }
         }
 
         TelegramHelperService::createTelegramUpdate(
