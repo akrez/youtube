@@ -14,7 +14,7 @@ class VideoService
     {
         $response = Response::status($video->status);
         if ($video->status == 200) {
-            $response->data($video->toArray());
+            $response->data($video);
         }
         return $response;
     }
@@ -96,14 +96,12 @@ class VideoService
 
     public static function encodeLink($url, $title, $ext, $disposition)
     {
-        return [
-            'payload' => encrypt([
-                'url' => $url,
-                'title' => $title,
-                'ext' => $ext,
-                'disposition' => $disposition,
-            ]),
-        ];
+        return encrypt([
+            'url' => $url,
+            'title' => $title,
+            'ext' => $ext,
+            'disposition' => $disposition,
+        ]);
     }
 
     public static function dencodeLink($payload)
