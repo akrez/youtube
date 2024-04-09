@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Facades\Response;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -29,47 +30,66 @@ class Handler extends ExceptionHandler
     /**
      * Register the exception handling callbacks for the application.
      */
-    public function render($request, Throwable $e)
+    public function register(): void
     {
-        if (!$request->expectsJson()) {
-            return parent::render($request, $e);
-        }
-
-        if ($e instanceof AuthenticationException) {
-            return $this->handle($e, $e->getMessage(), 401);
-        };
-        if ($e instanceof UnauthorizedException) {
-            return $this->handle($e, $e->getMessage(), 401);
-        };
-        if ($e instanceof NotFoundHttpException) {
-            return $this->handle($e, $e->getMessage(), 404);
-        };
-        if ($e instanceof NotFoundHttpException) {
-            return $this->handle($e, $e->getMessage(), 404);
-        };
-        if ($e instanceof ModelNotFoundException) {
-            return $this->handle($e, $e->getMessage(), 404);
-        };
-        if ($e instanceof MethodNotAllowedHttpException) {
-            return $this->handle($e, $e->getMessage(), 405);
-        };
-        if ($e instanceof ValidationException) {
-            return $this->handle($e, $e->getMessage(), 422, $e->errors());
-        };
-        if ($e instanceof ThrottleRequestsException) {
-            return $this->handle($e, $e->getMessage(), 429);
-        };
-        if ($e instanceof Throwable) {
-            return $this->handle($e, $e->getMessage(), 500);
-        };
-
-        return parent::render($request, $e);
+        $this->reportable(function (Throwable $e) {
+            //
+        });
     }
 
-    public function handle($e, $message, $status, $errors = [])
+    public function render($request, Throwable $exception)
+    {
+        if (!$request->expectsJson()) {
+            return parent::render($request, $exception);
+        }
+
+        if ($exception instanceof BadRequestException) {
+            return $this->renderError($exception, 400);
+        }
+
+        if ($exception instanceof AuthenticationException) {
+            return $this->renderError($exception, 401);
+        }
+
+        if ($exception instanceof NotFoundHttpException) {
+            return $this->renderError($exception, 404);
+        }
+
+        if ($exception instanceof NotFoundHttpException) {
+            return $this->renderError($exception, 404);
+        }
+
+        if ($exception instanceof ModelNotFoundException) {
+            return $this->renderError($exception, 404);
+        }
+
+        if ($exception instanceof UnauthorizedException) {
+            return $this->renderError($exception, 401);
+        }
+
+        if ($exception instanceof MethodNotAllowedHttpException) {
+            return $this->renderError($exception, 405);
+        }
+
+        if ($exception instanceof ValidationException) {
+            return $this->renderError($exception, 422, null,  $exception->errors());
+        }
+
+        if ($exception instanceof ThrottleRequestsException) {
+            return $this->renderError($exception, 429);
+        }
+
+        if ($exception instanceof Throwable) {
+            return $this->renderError($exception, 500);
+        }
+
+        return parent::render($request, $exception);
+    }
+
+    private function renderError(Throwable $exception, $status, ?string $message = null, $errors = [])
     {
         return Response::status($status)
-            ->message($message)
+            ->message($message ? $message : $exception->getMessage())
             ->errors($errors);
     }
 }
