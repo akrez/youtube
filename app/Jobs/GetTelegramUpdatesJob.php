@@ -46,7 +46,7 @@ class GetTelegramUpdatesJob implements ShouldQueue
             if ($videoId) {
                 Bus::chain([
                     new SyncYoutubeVideoInfoJob($videoId),
-                    new SendTelegramVideoJob($result['message']),
+                    new SendTelegramVideoJob($chatId, $videoId, $messageId),
                 ])->dispatch();
             } else {
                 dispatch(new SendTelegramMessageJob(
