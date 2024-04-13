@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\TelegramUpdate;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\MultipartStream;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Http;
 
 class TelegramApiService
@@ -32,6 +34,39 @@ class TelegramApiService
             'text' => $text,
             'reply_to_message_id' => $replyToMessageId,
         ]);
+    }
+
+    public static function sendVideo($chatId, $url, $replyToMessageId = null, $caption = null)
+    {
+        $client = new Client();
+        $multipartStream = new MultipartStream([
+            [
+                'name'     => 'video',
+                'contents' => fopen($url, 'r'),
+                'filename' => 'videoplayback.mp4'
+            ],
+            [
+                'name'     => 'caption',
+                'contents' => $caption,
+            ],
+            [
+                'name'     => 'chat_id',
+                'contents' => $chatId,
+            ],
+            [
+                'name'     => 'reply_to_message_id',
+                'contents' => $replyToMessageId,
+            ],
+        ]);
+
+        $token = env('TELEGRAM_BOT_TOKEN');
+        $url = "https://api.telegram.org/bot$token/sendvideo";
+
+        $request = new Request('POST', 'https://agent.akrezing.ir/', [
+            'X-POWERED-BY' => $url,
+        ], $multipartStream);
+
+        $response = $client->send($request);
     }
 
     public static function getUpdates($offset = null, $limit = 200)
