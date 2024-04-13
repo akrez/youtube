@@ -8,7 +8,7 @@ class ResponseService implements Responsable
 {
     public int $status = 200;
     public string $message = 'OK';
-    public array $data = [];
+    public mixed $data = [];
     public array $errors = [];
 
     public function status(int $status): ResponseService
@@ -25,7 +25,7 @@ class ResponseService implements Responsable
 
     public function data($data): ResponseService
     {
-        $this->data = is_array($data) ? $data : [$data];
+        $this->data = $data;
         return $this;
     }
 
