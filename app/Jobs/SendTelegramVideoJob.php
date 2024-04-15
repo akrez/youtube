@@ -50,9 +50,9 @@ class SendTelegramVideoJob implements ShouldQueue
                 try {
                     $headers = [];
                     $url = $value['url'];
-                    if (1) {
+                    if (env('X_POWERED_BY')) {
                         $headers['X-POWERED-BY'] = $url;
-                        $url = "https://agent.akrezing.ir/";
+                        $url = env('X_POWERED_BY');
                     }
                     $contentLength = Http::withHeaders($headers)->head($url)->header('Content-Length');
                 } catch (\Throwable $th) {
@@ -91,14 +91,18 @@ class SendTelegramVideoJob implements ShouldQueue
         ]);
 
         $token = env('TELEGRAM_BOT_TOKEN');
+
+        $headers = [];
         $url = "https://api.telegram.org/bot$token/sendvideo";
+        if (env('X_POWERED_BY')) {
+            $headers['X-POWERED-BY'] = $url;
+            $url = env('X_POWERED_BY');
+        }
 
         $request = new Request(
             'POST',
-            'https://agent.akrezing.ir/',
-            [
-                'X-POWERED-BY' => $url,
-            ],
+            $url,
+            $headers,
             $multipartStream
         );
         $client->send($request);

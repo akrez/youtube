@@ -13,10 +13,11 @@ class TelegramApiService
     {
         $token = env('TELEGRAM_BOT_TOKEN');
 
+        $headers = [];
         $url = "https://api.telegram.org/bot$token/$path";
-        if (1) {
+        if (env('X_POWERED_BY')) {
             $headers['X-POWERED-BY'] = $url;
-            $url = "https://agent.akrezing.ir/";
+            $url = env('X_POWERED_BY');
         }
 
         return Http::withHeaders($headers)->post($url, $data);
@@ -60,13 +61,17 @@ class TelegramApiService
         ]);
 
         $token = env('TELEGRAM_BOT_TOKEN');
+
+        $headers = [];
         $url = "https://api.telegram.org/bot$token/sendvideo";
+        if (env('X_POWERED_BY')) {
+            $headers['X-POWERED-BY'] = $url;
+            $url = env('X_POWERED_BY');
+        }
 
-        $request = new Request('POST', 'https://agent.akrezing.ir/', [
-            'X-POWERED-BY' => $url,
-        ], $multipartStream);
+        $request = new Request('POST', $url, $headers, $multipartStream);
 
-        $response = $client->send($request);
+        return $client->send($request);
     }
 
     public static function getUpdates($offset = null, $limit = 200)

@@ -71,13 +71,13 @@ class YoutubeApiService
 
     public static function getInfo($videoId): array
     {
-        $url = 'https://www.youtube.com/youtubei/v1/player';
         $headers = [
             'Accept-Encoding' => 'gzip, deflate',
         ];
-        if (1) {
+        $url = 'https://www.youtube.com/youtubei/v1/player';
+        if (env('X_POWERED_BY')) {
             $headers['X-POWERED-BY'] = $url;
-            $url = "https://agent.akrezing.ir/";
+            $url = env('X_POWERED_BY');
         }
 
         $jsonData = [
