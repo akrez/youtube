@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\GetTelegramUpdatesJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -12,7 +13,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $now = now();
+
+        $schedule
+            ->job(GetTelegramUpdatesJob::class)
+            ->everySecond()
+            ->withoutOverlapping()
+            ->when(function () use ($now) {
+                return now()->diffInSeconds($now) < 60;
+            });
     }
 
     /**
