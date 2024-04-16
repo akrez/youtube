@@ -3,11 +3,9 @@
 namespace App\Jobs;
 
 use App\Models\Videos;
+use App\Services\TelegramApiService;
 use App\Services\YoutubeUrlService;
 use Dotenv\Exception\ValidationException;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\MultipartStream;
-use GuzzleHttp\Psr7\Request;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -73,38 +71,11 @@ class SendTelegramVideoJob implements ShouldQueue
             throw new NotFoundHttpException();
         }
 
-        $client = new Client();
-        $multipartStream = new MultipartStream([
-            [
-                'name'     => 'video',
-                'contents' => \GuzzleHttp\Psr7\Utils::streamFor($format['url']),
-                'filename' => 'videoplayback.mp4'
-            ],
-            [
-                'name'     => 'chat_id',
-                'contents' => $this->chatId,
-            ],
-            [
-                'name'     => 'reply_to_message_id',
-                'contents' => $this->replyToMessageId,
-            ],
-        ]);
-
-        $token = env('TELEGRAM_BOT_TOKEN');
-
-        $headers = [];
-        $url = "https://api.telegram.org/bot$token/sendvideo";
-        if (env('X_POWERED_BY')) {
-            $headers['X-POWERED-BY'] = $url;
-            $url = env('X_POWERED_BY');
-        }
-
-        $request = new Request(
-            'POST',
-            $url,
-            $headers,
-            $multipartStream
+        TelegramApiService::sendVideo(
+            $this->chatId,
+            $format['url'],
+            $this->replyToMessageId,
+            $video->title
         );
-        $client->send($request);
     }
 }
