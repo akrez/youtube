@@ -53,6 +53,7 @@ class SendTelegramVideoJob implements ShouldQueue
                         $url = env('X_POWERED_BY');
                     }
                     $contentLength = Http::withHeaders($headers)
+                        ->asForm()
                         ->head($url)
                         ->header('Content-Length');
                 } catch (\Throwable $th) {
