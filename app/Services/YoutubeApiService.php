@@ -118,6 +118,7 @@ class YoutubeApiService
 
         try {
             $result = Http::withHeaders($headers)
+                ->asForm()
                 ->withBody(json_encode($jsonData))
                 ->post($url)
                 ->json();

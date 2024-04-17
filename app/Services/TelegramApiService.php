@@ -20,7 +20,9 @@ class TelegramApiService
             $url = env('X_POWERED_BY');
         }
 
-        return Http::withHeaders($headers)->post($url, $data);
+        return Http::withHeaders($headers)
+            ->asForm()
+            ->post($url, $data);
     }
 
     public static function getMe()

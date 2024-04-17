@@ -6,12 +6,14 @@ use App\Models\TelegramUpdate;
 
 class TelegramUpdateService
 {
-    public static function create($status, $response, $offset)
+    public static function firstOrCreate($id, $message, $videoId)
     {
-        return TelegramUpdate::create([
-            'status' => $status,
-            'response' => $response,
-            'offset' => $offset,
-        ]);
+        return TelegramUpdate::firstOrCreate(
+            ['id' => $id],
+            [
+                'message' => json_encode($message),
+                'video_id' => $videoId,
+            ],
+        );
     }
 }
