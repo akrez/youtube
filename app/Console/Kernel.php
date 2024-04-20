@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
 
         $schedule
             ->job(GetTelegramUpdatesJob::class)
-            ->everySecond()
+            ->everyFiveSeconds()
             ->withoutOverlapping()
             ->when(function () use ($now) {
                 return now()->diffInSeconds($now) < 60;

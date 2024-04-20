@@ -12,10 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('telegram_updates', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedSmallInteger('status')->default('0');
-            $table->longText('response');
-            $table->unsignedInteger('offset')->nullable();
+            $table->unsignedBigInteger('id')->primary('id');
+            $table->string('video_id')->nullable();
+            $table->longText('message');
             $table->timestamps();
         });
     }

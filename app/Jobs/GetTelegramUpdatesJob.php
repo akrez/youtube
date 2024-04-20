@@ -31,38 +31,46 @@ class GetTelegramUpdatesJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $newOffset = TelegramUpdate::max('offset') + 0;
-        $response = TelegramApiService::getUpdates($newOffset + 1);
+        $maxId = TelegramUpdate::max('id') + 0;
+        $response = TelegramApiService::getUpdates($maxId + 1);
         $results = Arr::get($response->json(), 'result', []);
 
         foreach ($results as $result) {
-            $newOffset = max($result['update_id'], $newOffset);
 
-            $messageId = $result['message']['message_id'];
-            $chatId = $result['message']['chat']['id'];
-            $text = $result['message']['text'];
+            $id = $result['update_id'];
+            $message = ($result['message'] ?? $result['edited_message']);
 
-            $videoId = YoutubeUrlService::parse($text);
+            if (
+                isset($message['from']['is_bot']) and
+                $message['from']['is_bot']
+            ) {
+                continue;
+            }
+
+            $videoId = YoutubeUrlService::parse($message['text']);
+
+            $telegramUpdate = TelegramUpdateService::firstOrCreate(
+                $id,
+                $message,
+                $videoId
+            );
+
+            if (!$telegramUpdate->wasRecentlyCreated) {
+                continue;
+            }
+
             if ($videoId) {
                 Bus::chain([
                     new SyncYoutubeVideoInfoJob($videoId),
-                    new SendTelegramVideoJob($chatId, $videoId, $messageId),
+                    new SendTelegramVideoJob($message['chat']['id'], $videoId, $message['message_id']),
                 ])->dispatch();
             } else {
                 dispatch(new SendTelegramMessageJob(
-                    $chatId,
-                    __('validation.regex', [
-                        'attribute' => __('validation.attributes.v'),
-                    ]),
-                    $messageId
+                    $message['chat']['id'],
+                    __('validation.regex', ['attribute' => __('validation.attributes.v')]),
+                    $message['message_id']
                 ));
             }
         }
-
-        TelegramUpdateService::create(
-            $response->status(),
-            $response->body(),
-            $newOffset
-        );
     }
 }
