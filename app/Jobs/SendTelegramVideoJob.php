@@ -36,7 +36,17 @@ class SendTelegramVideoJob implements ShouldQueue
             throw new ValidationException();
         }
 
-        $video = Videos::where('status', 200)->findOrFail($videoId);
+        $video = Videos::find($videoId);
+        if (
+            !$video or
+            $video->status != 200
+        ) {
+            dispatch(new SendTelegramMessageJob(
+                $this->chatId,
+                __('validation.regex', ['attribute' => __('validation.attributes.v')]),
+                $this->replyToMessageId
+            ));
+        }
 
         $format = collect($video->formats)
             ->reverse()
