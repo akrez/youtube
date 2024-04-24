@@ -55,10 +55,6 @@ class Handler extends ExceptionHandler
             return $this->renderError($exception, 404);
         }
 
-        if ($exception instanceof NotFoundHttpException) {
-            return $this->renderError($exception, 404);
-        }
-
         if ($exception instanceof ModelNotFoundException) {
             return $this->renderError($exception, 404);
         }
