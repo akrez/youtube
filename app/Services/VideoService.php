@@ -10,39 +10,50 @@ use Illuminate\Support\Arr;
 
 class VideoService
 {
-    public static function response(Videos $video)
+    public static function response($status, $message, $videoId, ?Videos $video)
     {
-        $response = Response::status($video->status);
-        if ($video->status == 200) {
-            $response->data($video);
-        }
-        return $response;
+        return Response::status($status)->message($message)->data([
+            'video_id' => $videoId,
+            'video' => ($status == 200 ? $video : null),
+        ]);
     }
 
     public static function sync(string $videoId)
     {
-        $videoId = YoutubeUrlService::parse($videoId);
-        if (!$videoId) {
-            return Response::status(422)
-                ->message(__('validation.regex', [
-                    'attribute' => __('validation.attributes.v'),
-                ]));
+        $videoIdParsed = YoutubeUrlService::parse($videoId);
+        if (!$videoIdParsed) {
+            return VideoService::response(
+                422,
+                __('validation.regex', ['attribute' => __('validation.attributes.v')]),
+                $videoId,
+                null
+            );
         }
 
-        $video = Videos::where('id', $videoId)->filterRecently()->first();
+        $video = Videos::where('id', $videoIdParsed)->filterRecently()->first();
         if ($video) {
-            return VideoService::response($video);
+            return VideoService::response(
+                $video->status,
+                'OK',
+                $videoIdParsed,
+                $video
+            );
         }
 
-        $youtubeResponse = YoutubeApiService::getInfo($videoId);
-        $video = Videos::updateOrCreate(['id' => $videoId], [
+        $youtubeResponse = YoutubeApiService::getInfo($videoIdParsed);
+        $video = Videos::updateOrCreate(['id' => $videoIdParsed], [
             'status' => ($youtubeResponse ? 200 : 404),
             'title' => Arr::get($youtubeResponse, 'videoDetails.title'),
             'formats' => Arr::get($youtubeResponse, 'streamingData.formats', []),
             'adaptive_formats' => Arr::get($youtubeResponse, 'streamingData.adaptiveFormats', []),
             'synced_at' => now(),
         ]);
-        return VideoService::response($video);
+        return VideoService::response(
+            $video->status,
+            $youtubeResponse ? 'OK' : __('Not Found'),
+            $videoIdParsed,
+            $video
+        );
     }
 
     public static function getMimeExtention($mimeType)

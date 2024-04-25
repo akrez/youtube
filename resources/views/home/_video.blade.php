@@ -64,7 +64,7 @@
         </table>
     </div>
     <div class="col-md-8">
-        @if ($format = $video->formats)
+        @if ($format = Arr::last($video->formats))
             <video class="rounded w-100" controls>
                 <source
                     src="{{ route('stream', [
