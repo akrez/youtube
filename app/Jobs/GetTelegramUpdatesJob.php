@@ -2,17 +2,13 @@
 
 namespace App\Jobs;
 
-use App\Models\TelegramUpdate;
-use App\Services\TelegramApiService;
 use App\Services\TelegramUpdateService;
-use App\Services\YoutubeUrlService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Bus;
 
 class GetTelegramUpdatesJob implements ShouldQueue
 {
@@ -23,7 +19,17 @@ class GetTelegramUpdatesJob implements ShouldQueue
      */
     public function __construct()
     {
-        //
+        $this->onQueue('GetTelegramUpdatesJob');
+    }
+
+    /**
+     * Get the middleware the job should pass through.
+     *
+     * @return array<int, object>
+     */
+    public function middleware(): array
+    {
+        return [new WithoutOverlapping()];
     }
 
     /**
