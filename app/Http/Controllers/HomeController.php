@@ -31,6 +31,7 @@ class HomeController extends Controller
     public function stream()
     {
         $params = VideoService::dencodeLink(request('payload'));
+
         return YoutubeApiService::stream(
             $params['url'],
             $params['title'] . '.' . $params['ext'],
