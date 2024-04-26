@@ -12,7 +12,9 @@ class HomeController extends Controller
     {
         $videoId = $request->validated('v');
         if (!$videoId) {
-            return view('home.index');
+            return view('home.index', [
+                'video' => null,
+            ]);
         }
 
         $response = VideoService::sync($videoId);
