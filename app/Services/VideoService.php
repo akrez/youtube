@@ -108,17 +108,26 @@ class VideoService
 
     public static function encodeLink($url, $title, $ext, $disposition)
     {
-        return (new Encryption)->encrypt([
-            'url' => $url,
-            'title' => $title,
-            'ext' => $ext,
-            'disposition' => $disposition,
-        ]);
+        $encryption = new Encryption();
+
+        return [
+            'url' => $encryption->encrypt($url),
+            'title' => $encryption->encrypt($title),
+            'ext' => $encryption->encrypt($ext),
+            'disposition' => $encryption->encrypt($disposition),
+        ];
     }
 
-    public static function dencodeLink($payload)
+    public static function dencodeLink($url, $title, $ext, $disposition)
     {
-        return (new Encryption)->decrypt($payload);
+        $encryption = new Encryption();
+
+        return [
+            'url' => $encryption->decrypt($url),
+            'title' => $encryption->decrypt($title),
+            'ext' => $encryption->decrypt($ext),
+            'disposition' => $encryption->decrypt($disposition),
+        ];
     }
 
     public static function formatToHumanableSize($size, $unit = "")

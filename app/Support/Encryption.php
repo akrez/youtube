@@ -11,22 +11,18 @@ class Encryption
         $this->key = env('APP_KEY');
     }
 
-    public function encrypt(array $arr): string
+    public function encrypt($str)
     {
-        $str = json_encode($arr);
-
         $str = $this->strRotPass($str, $this->key);
 
         return $this->base64Encode($str);
     }
 
-    public function decrypt(string $str): array
+    public function decrypt($str)
     {
         $str = $this->base64Decode($str);
 
-        $arr = $this->strRotPass($str, $this->key, true);
-
-        return json_decode($arr, true);
+        return $this->strRotPass($str, $this->key, true);
     }
 
     private function strRotPass($str, $key, $decrypt = false): string

@@ -45,14 +45,15 @@
                                 <td class="align-middle">{{ Arr::get($format, 'audioSampleRate') }}</td>
                                 <td class="align-middle">
                                     <a class="btn btn-primary w-100"
-                                        href="{{ route('stream', [
-                                            'payload' => App\Services\VideoService::encodeLink(
+                                        href="{{ route(
+                                            'stream',
+                                            App\Services\VideoService::encodeLink(
                                                 Arr::get($format, 'url'),
                                                 $video->title,
                                                 App\Services\VideoService::getMimeExtention(Arr::get($format, 'mimeType')),
                                                 'download',
-                                            ),
-                                        ]) }}">
+                                            )
+                                        ) }}">
                                         @lang('Download')
                                     </a>
                                 </td>
@@ -67,14 +68,15 @@
         @if ($format = Arr::last($video->formats))
             <video class="rounded w-100" controls>
                 <source
-                    src="{{ route('stream', [
-                        'payload' => App\Services\VideoService::encodeLink(
+                    src="{{ route(
+                        'stream',
+                        App\Services\VideoService::encodeLink(
                             Arr::get($format, 'url'),
                             $video->title,
                             App\Services\VideoService::getMimeExtention(Arr::get($format, 'mimeType')),
                             'download',
-                        ),
-                    ]) }}" />
+                        )
+                    ) }}" />
                 <em>Sorry, your browser doesn't support HTML5 video.</em>
             </video>
         @endif
