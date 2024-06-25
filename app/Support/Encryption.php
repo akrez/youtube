@@ -20,7 +20,7 @@ class Encryption
         return $this->base64Encode($str);
     }
 
-    public function decrypt($str): string
+    public function decrypt(string $str): array
     {
         $str = $this->base64Decode($str);
 
