@@ -6,6 +6,7 @@ use App\Facades\Response;
 use App\Models\Videos;
 use App\Services\YoutubeApiService;
 use App\Services\YoutubeUrlService;
+use App\Support\Encryption;
 use Illuminate\Support\Arr;
 
 class VideoService
@@ -107,7 +108,7 @@ class VideoService
 
     public static function encodeLink($url, $title, $ext, $disposition)
     {
-        return encrypt([
+        return (new Encryption)->encrypt([
             'url' => $url,
             'title' => $title,
             'ext' => $ext,
@@ -117,7 +118,7 @@ class VideoService
 
     public static function dencodeLink($payload)
     {
-        return decrypt($payload);
+        return (new Encryption)->decrypt($payload);
     }
 
     public static function formatToHumanableSize($size, $unit = "")
