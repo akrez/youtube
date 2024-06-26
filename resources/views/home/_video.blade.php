@@ -19,7 +19,7 @@
             </thead>
             <tbody>
                 @foreach (['formats', 'adaptive_formats'] as $formatKey)
-                    @foreach ($video->$formatKey as $format)
+                    @foreach ($video->$formatKey as $formatId => $format)
                         @if (Arr::get($format, 'url'))
                             <tr>
                                 <td class="align-middle">
@@ -45,15 +45,11 @@
                                 <td class="align-middle">{{ Arr::get($format, 'audioSampleRate') }}</td>
                                 <td class="align-middle">
                                     <a class="btn btn-primary w-100"
-                                        href="{{ route(
-                                            'stream',
-                                            App\Services\VideoService::encodeLink(
-                                                Arr::get($format, 'url'),
-                                                $video->title,
-                                                App\Services\VideoService::getMimeExtention(Arr::get($format, 'mimeType')),
-                                                'download',
-                                            )
-                                        ) }}">
+                                        href="{{ route('stream', [
+                                            'video_id' => $video->id,
+                                            'format_key' => $formatKey,
+                                            'format_id' => $formatId,
+                                        ]) }}">
                                         @lang('Download')
                                     </a>
                                 </td>
@@ -65,18 +61,14 @@
         </table>
     </div>
     <div class="col-md-8">
-        @if ($format = Arr::last($video->formats))
+        @if (null !== array_key_last($video->formats))
             <video class="rounded w-100" controls>
                 <source
-                    src="{{ route(
-                        'stream',
-                        App\Services\VideoService::encodeLink(
-                            Arr::get($format, 'url'),
-                            $video->title,
-                            App\Services\VideoService::getMimeExtention(Arr::get($format, 'mimeType')),
-                            'download',
-                        )
-                    ) }}" />
+                    src="{{ route('stream', [
+                        'video_id' => $video->id,
+                        'format_key' => 'format',
+                        'format_id' => array_key_last($video->formats),
+                    ]) }}" />
                 <em>Sorry, your browser doesn't support HTML5 video.</em>
             </video>
         @endif

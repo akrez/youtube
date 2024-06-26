@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\HomeIndexRequest;
+use App\Models\Videos;
 use App\Services\VideoService;
 use App\Services\YoutubeApiService;
+use Illuminate\Support\Arr;
 
 class HomeController extends Controller
 {
@@ -32,18 +34,17 @@ class HomeController extends Controller
 
     public function stream()
     {
-        $params = VideoService::dencodeLink(
-            request('url'),
-            request('title'),
-            request('ext'),
-            request('disposition')
-        );
+        $video = Videos::findOrFail(request('video_id'));
+        $formatKey = (request('format_key') === 'formats' ? 'formats' : 'adaptive_formats');
+        $formatId = intval(request('format_id'));
+
+        throw_if(!isset($video->$formatKey[$formatId]));
+        $format = $video->$formatKey[$formatId];
 
         return YoutubeApiService::stream(
-            $params['url'],
-            $params['title'] . '.' . $params['ext'],
-            request()->header('Range'),
-            boolval('inline' == $params['disposition'])
+            Arr::get($format, 'url'),
+            $video->title . '.' . VideoService::getMimeExtention(Arr::get($format, 'mimeType')),
+            request()->header('Range')
         );
     }
 }

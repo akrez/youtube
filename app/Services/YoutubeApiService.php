@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class YoutubeApiService
 {
-    public static function stream($url, $name, $range, $isInline, $bufferLength = 262144): StreamedResponse
+    public static function stream($url, $name, $range, $bufferLength = 262144): StreamedResponse
     {
         $guzzleHeaders = [
             'User-Agent' => fake()->userAgent(),
@@ -63,7 +63,7 @@ class YoutubeApiService
                 },
                 $name,
                 $headers,
-                ($isInline ? 'inline' : 'attachment')
+                'inline'
             )
             ->setStatusCode($guzzleResponse->getStatusCode())
             ->setProtocolVersion($guzzleResponse->getProtocolVersion());
